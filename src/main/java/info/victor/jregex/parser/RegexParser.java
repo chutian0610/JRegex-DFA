@@ -212,20 +212,31 @@ public class RegexParser {
      */
     final RegexNode parseAtomExp() {
         if (match('[')) {
-            boolean negate = false;
-            if (match('^')) {
-                negate = true;
-            }
-            RegexNode e = parseCharacterClasses();
-            if (negate) {
-                e = onComplement(e);
-            }
+            RegexNode e = parseBracketExp();
             if (!match(']')) {
                 throw new IllegalArgumentException("expected ']' at position " + position);
             }
             return e;
-        } else
+        } else {
             return parseCharExp();
+        }
+    }
+
+    /**
+     * 处理中括号表达式
+     * 注意中括号表达式中无需使用转义，[\\.] -> [.]
+     * @return
+     */
+    final RegexNode parseBracketExp(){
+        boolean negate = false;
+        if (match('^')) {
+            negate = true;
+        }
+        RegexNode e = parseCharacterClasses();
+        if (negate) {
+            e = onComplement(e);
+        }
+        return e;
     }
 
     /**
@@ -245,18 +256,26 @@ public class RegexParser {
      * @return
      */
     final RegexNode parseCharaterRange() {
-        RegexNode c = parseCharExp();
+        RegexNode c = parseChar();
         if (match('-')) {
             if (peek("]")) {
                 return onCharClasses(c, onChar('-'));
             }
             else {
-                return onCharRange(((CharRegexNode)c).getCharacter(), ((CharRegexNode)parseCharExp()).getCharacter());
+                return onCharRange(((CharRegexNode)c).getCharacter(), ((CharRegexNode)parseChar()).getCharacter());
             }
         }
         else {
             return c;
         }
+    }
+
+    /**
+     * 处理普通字符
+     * @return
+     */
+    final RegexNode parseChar(){
+        return onChar(next());
     }
 
     /**
@@ -268,7 +287,7 @@ public class RegexParser {
         if (match('.')) {
             return onAnyCharNotNewLine();
         }
-        // 转义字符或是普通字符
+        // 转义字符或是普通字符,只取需要处理的部分
         match('\\');
         return onChar(next());
     }
@@ -290,35 +309,26 @@ public class RegexParser {
     }
 
     /**
-     * whether next chars match string in string array，if no element matched ,return null.
-     * @param strs
+     * whether next chars match string .
+     * @param str
      * @return
      */
-    private String matches(String... strs){
-        if(more()) {
-            loop1:
-            for (String str : strs) {
-                if(str == null || "".equals(str)){
-                    throw new IllegalArgumentException("strs must not contains empty string!");
-                }
-                boolean flag = true;
-                loop2:
-                for (int i=0;i<str.length();i++){
-                    if(str.charAt(i) != regex.charAt(position+i)){
-                        flag = false;
-                        break loop2;
-                    }
-                }
-                if(flag){
-                    position = position + str.length();
-                    return str;
-                }
+    private boolean matches(String str){
+        boolean flag = true;
+        for (int i=0;i<str.length();i++) {
+            if (position + i >= regex.length()) {
+                flag = false;
+                break; // not match
             }
-            return null;
-
-        }else {
-            return null;
+            if (str.charAt(i) != regex.charAt(position + i)) {
+                flag = false;
+                break; // not match
+            }
         }
+        if(flag){
+            position = position + str.length();
+        }
+        return true;
     }
 
     /**

@@ -15,8 +15,4 @@ public class Pattern {
      *  正则字符串
      */
     private String regex;
-
-
-
-
 }

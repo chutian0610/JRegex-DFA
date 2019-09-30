@@ -7,26 +7,27 @@ union   = concat
 concat  = repeat
         | repeat concatexp
         ;
-repeat  = basic ? (zero or one occurrence) 
-        | basic * (zero or more occurrences) 
-        | basic *? {zero or more, non-greedy}
-        | basic + (one or more occurrences) 
-        | basic +? {one or more, non-greedy}
-        | basic {n} (n occurrences) 
-        | basic {n,} (n or more occurrences) 
-        | basic {n,m} (n to m occurrences, including both) 
+repeat  = basic '?' (zero or one occurrence) 
+        | basic '*' (zero or more occurrences) 
+        | basic '*?' {zero or more, non-greedy}
+        | basic '+' (one or more occurrences) 
+        | basic '+?' {one or more, non-greedy}
+        | basic '{n}' (n occurrences) 
+        | basic '{n,}' (n or more occurrences) 
+        | basic '{n,m}' (n to m occurrences, including both) 
         | basic
         ;
 basic   = atom
         | ( union )
         ;
         
-atom  = characterclass
-      | specialcharacterclass {.,\w,[:alnum:]}
+atom  = '[' bracketExp ']'
+      | characterExp
       ;
 
+bracketExp = '^'? characterclass;
 
-characterclass = characterrange
+characterclass =  characterrange
                 | characterrange characterclass
                 ;
 
@@ -34,15 +35,14 @@ characterrange  = character
                 | character - character
                 ;
 
-character =  any non metacharacter 
-          | '\' metacharacter
-          ;
+characterExp =  metacharacter
+             |  '\' metacharacter {metacharacters which length =1 }
+             |  any character not in metacharacter
+             ;
 
-metacharacter = ?
+metacharacter = ? {=0 or 1, greedy}
               | * {=0 or more, greedy}
-              | *? {=0 or more, non-greedy}
               | + {=1 or more, greedy}
-              | +? {=1 or more, non-greedy}
               | ^ {=begin of line character}
               | $ {=end of line character}
               | $` {=the characters to the left of the match}
@@ -72,4 +72,5 @@ metacharacter = ?
 
 ## 参考资料
 
-1. [stackoverflow ](https://stackoverflow.com/questions/265457/regex-grammar)
+1. [stackoverflow](https://stackoverflow.com/questions/265457/regex-grammar)
+2. [POSIX字符组](https://zh.wikipedia.org/wiki/正则表达式#POSIX字符组)
