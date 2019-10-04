@@ -19,6 +19,6 @@ public class RepeatRegexNode extends RegexNode{
         this.min = min;
         this.max = max;
         this.inner = inner;
-        this.greedy = true;
+        this.greedy = greedy;
     }
 }

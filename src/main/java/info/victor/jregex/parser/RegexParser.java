@@ -3,7 +3,7 @@ package info.victor.jregex.parser;
 import info.victor.jregex.grammar.*;
 import info.victor.jregex.grammar.charclass.AnyCharNotNewLine;
 import info.victor.jregex.grammar.charclass.CharRangeRegexNode;
-import info.victor.jregex.grammar.charclass.CharRegexNode;
+import info.victor.jregex.grammar.CharRegexNode;
 
 public class RegexParser {
     /**
@@ -100,7 +100,7 @@ public class RegexParser {
     static RegexNode onAnyCharNotNewLine() {
         return new AnyCharNotNewLine();
     }
-    static RegexNode onCharClasses(RegexNode... regexNodes) {
+    static RegexNode onCharSets(RegexNode... regexNodes) {
         return new CharClassesRegexNode(regexNodes);
     }
 
@@ -142,7 +142,6 @@ public class RegexParser {
             }
             else if (match('*')) {
                 if(match('?')){
-                    next(); // skip '?'
                     node = onRepeatMinly(node, 0,false);
                 }else {
                     node = onRepeatMinly(node, 0,true);
@@ -150,10 +149,9 @@ public class RegexParser {
             }
             else if (match('+')) {
                 if(match('?')) {
-                    next(); // skip '?'
                     node = onRepeatMinly(node, 1,false);
                 }else {
-                    node = onRepeatMinly(node, 1,false);
+                    node = onRepeatMinly(node, 1,true);
                 }
             }
             else if (match('{')) {
@@ -218,13 +216,12 @@ public class RegexParser {
             }
             return e;
         } else {
-            return parseCharExp();
+            return parseSimpleExp();
         }
     }
 
     /**
      * 处理中括号表达式
-     * 注意中括号表达式中无需使用转义，[\\.] -> [.]
      * @return
      */
     final RegexNode parseBracketExp(){
@@ -232,21 +229,33 @@ public class RegexParser {
         if (match('^')) {
             negate = true;
         }
-        RegexNode e = parseCharacterClasses();
+        RegexNode e = parseCharacterSets();
         if (negate) {
             e = onComplement(e);
         }
         return e;
     }
 
+    final RegexNode parseSimpleExp(){
+        ////todo
+        //============ special Char   =============
+
+        //===========================================
+
+        //============ special Char Set =============
+
+        //===========================================
+        return parseCharExp();
+    }
+
     /**
      * 处理语法: 字符类
      * @return
      */
-    final RegexNode parseCharacterClasses() {
-        RegexNode e = parseCharaterRange();
+    final RegexNode parseCharacterSets() {
+        RegexNode e = parseCharacterSet();
         while (more() && !peek("]")) {
-            e = onCharClasses(e, parseCharacterClasses());
+            e = onCharSets(e, parseCharacterSets());
         }
         return e;
     }
@@ -255,14 +264,18 @@ public class RegexParser {
      * 处理字符类语法
      * @return
      */
-    final RegexNode parseCharaterRange() {
-        RegexNode c = parseChar();
+    final RegexNode parseCharacterSet() {
+        ////todo
+        //============ special Char Set =============
+
+        //===========================================
+        RegexNode c = parseCharExp();
         if (match('-')) {
             if (peek("]")) {
-                return onCharClasses(c, onChar('-'));
+                return onCharSets(c, onChar('-'));
             }
             else {
-                return onCharRange(((CharRegexNode)c).getCharacter(), ((CharRegexNode)parseChar()).getCharacter());
+                return onCharRange(((CharRegexNode)c).getCharacter(), ((CharRegexNode)parseCharExp()).getCharacter());
             }
         }
         else {
@@ -271,22 +284,10 @@ public class RegexParser {
     }
 
     /**
-     * 处理普通字符
-     * @return
-     */
-    final RegexNode parseChar(){
-        return onChar(next());
-    }
-
-    /**
      * 处理 普通字符，和转义字符
      * @return
      */
     final RegexNode parseCharExp() {
-        ////todo 此处可以添加更多特殊字符处理
-        if (match('.')) {
-            return onAnyCharNotNewLine();
-        }
         // 转义字符或是普通字符,只取需要处理的部分
         match('\\');
         return onChar(next());

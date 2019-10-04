@@ -15,4 +15,9 @@ public class Pattern {
      *  正则字符串
      */
     private String regex;
+
+    public static void main(String[] args) {
+        String test = "\n";
+        System.out.println(test.length());
+    }
 }

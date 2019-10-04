@@ -1,5 +1,7 @@
 package info.victor.jregex.grammar.charclass;
 
-public class AnyCharNotNewLine extends SpecialCharRegexNode {
+import info.victor.jregex.grammar.CharClassRegexNode;
+
+public class AnyCharNotNewLine extends CharClassRegexNode {
 
 }

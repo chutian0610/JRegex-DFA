@@ -1,5 +1,7 @@
 # ebnf
 
+这是正则表达式目前支持的语法:
+
 ```ebnf
 union   = concat
         | concat | union
@@ -22,52 +24,36 @@ basic   = atom
         ;
         
 atom  = '[' bracketExp ']'
-      | characterExp
+      | simpleExp
       ;
 
-bracketExp = '^'? characterclass;
+bracketExp = '^'? characterSets;
 
-characterclass =  characterrange
-                | characterrange characterclass
+characterSets =  characterSet
+                | characterSet characterSets
                 ;
 
-characterrange  = character
-                | character - character
+characterSet  = specialSet
+                | characterExp
+                | characterExp - characterExp
                 ;
 
-characterExp =  metacharacter
-             |  '\' metacharacter {metacharacters which length =1 }
-             |  any character not in metacharacter
+characterExp =  character      { 非转义字符 }
+             |  '\' character  { 转义字符 }
              ;
-
-metacharacter = ? {=0 or 1, greedy}
-              | * {=0 or more, greedy}
-              | + {=1 or more, greedy}
-              | ^ {=begin of line character}
-              | $ {=end of line character}
-              | $` {=the characters to the left of the match}
-              | $' {=the characters to the right of the match}
-              | $& {=the characters that are matched}
-              | \t {=tab character}
-              | \n {=newline character}
-              | \r {=carriage return character}
-              | \f {=form feed character}
-              | \cX {=control character CTRL-X}
-              | \N {=the characters in Nth tag (if on match side)}
-              | $N{=the characters in Nth tag (if not on match side)}
-              | \NNN {=octal code for character NNN}
-              | \b {=match a 'word' boundary}
-              | \B {=match not a 'word' boundary}
-              | \d {=a digit, [0-9]}
-              | \D {=not a digit, [^0-9]}
-              | \s {=whitespace, [ \t\n\r\f]}
-              | \S {=not a whitespace, [^ \t\n\r\f]}
-              | \w {='word' character, [a-zA-Z0-9_]}
-              | \W {=not a 'word' character, [^a-zA-Z0-9_]}
-              | \Q {=put a quote (de-meta) on characters, until \E}
-              | \U {=change characters to uppercase, until \E}
-              | \L {=change characters to uppercase, until \E}
-              ;
+             
+specialSet  = \d { 数字,[0-9] }
+            | \D { 非数字,[^0-9] }
+            | \w { 单词,[a-zA-Z0-9_] }
+            | \W { 非单词,[^a-zA-Z0-9_] }
+            ;
+           
+simpleExp = specialChar
+          | specialSet
+          | characterExp
+          ;
+specialChar = . { any char except \n }
+            ;
 ``` 
 
 ## 参考资料

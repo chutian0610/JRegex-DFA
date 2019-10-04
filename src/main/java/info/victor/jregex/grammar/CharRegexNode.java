@@ -1,6 +1,4 @@
-package info.victor.jregex.grammar.charclass;
-
-import info.victor.jregex.grammar.CharClassRegexNode;
+package info.victor.jregex.grammar;
 
 public class CharRegexNode extends CharClassRegexNode {
     public Character getCharacter() {
