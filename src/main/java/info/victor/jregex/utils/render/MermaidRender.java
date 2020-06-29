@@ -86,6 +86,6 @@ public class MermaidRender {
                 new FlowChartBuilder().direction("LR")
                         .link("A","nodeA","B","nodeB")
                         .link2("B","C","nodeC"));
-        mermaidRender.render("/Users/chutian/Downloads/test.html");
+        mermaidRender.render(System.getProperty("user.dir")+File.separator+"test.html");
     }
 }
