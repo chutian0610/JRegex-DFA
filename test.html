@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://unpkg.com/mermaid@8/dist/mermaid.min.js"></script></head>
+<body>
+<div class="mermaid">
+graph LR
+A["nodeA"]-->B["nodeB"]
+B-->C["nodeC"]
+</div>
+<script>
+var config = {
+	"arrowMarkerAbsolute":false,
+	"flowchart":{
+		"curve":"linear",
+		"htmlLabels":true
+	},
+	"gantt":{
+		"axisFormat":"%Y-%m-%d",
+		"barGap":4,
+		"barHeight":20,
+		"fontFamily":"'Open-Sans', 'sans-serif'",
+		"fontSize":11,
+		"gridLineStartPadding":35,
+		"leftPadding":75,
+		"numberSectionStyles":4,
+		"titleTopMargin":25,
+		"topPadding":50
+	},
+	"logLevel":"fatal",
+	"securityLevel":"strict",
+	"sequence":{
+		"actorMargin":50,
+		"bottomMarginAdj":1,
+		"boxMargin":10,
+		"boxTextMargin":5,
+		"diagramMarginX":50,
+		"diagramMarginY":10,
+		"height":65,
+		"messageMargin":35,
+		"mirrorActors":true,
+		"noteMargin":10,
+		"rightAngles":false,
+		"showSequenceNumbers":false,
+		"useMaxWidth":true,
+		"width":150
+	},
+	"startOnLoad":true,
+	"theme":"forest"
+};
+mermaid.initialize(config);
+</script>
+</body>
+</html>
